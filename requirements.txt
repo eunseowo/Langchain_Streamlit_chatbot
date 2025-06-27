@@ -1,0 +1,32 @@
+# --- LangChain 스택 ---------------------
+langchain>=0.3.26
+langchain_community>=0.3.26
+langchain_openai>=0.3.24
+langchain-anthropic>=0.3.15
+langchain-text-splitters>=0.3.8
+langchain-chroma>=0.2.4
+langchain-ollama>=0.3.3
+langchain-experimental>=0.3.4
+
+# --- LLM 클라이언트 ---------------------
+anthropic>=0.54.0
+openai>=1.90.0
+
+# --- 텍스트 & PDF 처리 -------------------
+nltk==3.8.1                # 학습 코드와 호환되는 마지막 LTS
+pypdfium2>=4.30.1
+pypdf>=5.6.1
+rapidocr-onnxruntime>=1.4.4
+sentence-transformers>=4.1.0
+unstructured[pdf]>=0.17.2  # extra[pdf] 포함
+
+# --- 프레젠테이션 ------------------------
+python-pptx>=1.0.2
+
+# --- 파일 타입 감지 -----------------------
+python-magic>=0.4.27                 # macOS·Linux
+python-magic-bin==0.4.14 ; sys_platform == "win32"   # Windows에서만
+
+# --- 벡터·그래프 -------------------------
+faiss-cpu                            # macOS는 arm64 wheel 지원
+grandalf
