@@ -9,13 +9,13 @@ sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 from langchain.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
-from langchain.vectorstores import Chroma
+from langchain_community.vectorstores import Chroma
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains import create_history_aware_retriever, create_retrieval_chain
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_community.chat_message_histories.streamlit import StreamlitChatMessageHistory
-from chromadb.config import Settings  # 필요한 설정 임포트
+from chromadb.config import Settings
 
 # OpenAI API 키 설정
 os.environ["OPENAI_API_KEY"] = st.secrets['OPENAI_API_KEY']
@@ -59,7 +59,7 @@ def get_vectorstore(_docs):
 
 @st.cache_resource
 def initialize_components(selected_model):
-    file_path = "data/대한민국헌법(헌법)(제00010호)(19880225).pdf"
+    file_path = "data/대한민국헌법(헌법)(제00010호)(19880225).pdf"
     pages = load_and_split_pdf(file_path)
     vectorstore = get_vectorstore(pages)
     retriever = vectorstore.as_retriever()
@@ -113,3 +113,4 @@ if prompt_message := st.chat_input("Your question"):
             with st.expander("참고 문서 확인"):
                 for doc in response['context']:
                     st.markdown(doc.metadata['source'], help=doc.page_content)
+
