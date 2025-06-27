@@ -30,3 +30,6 @@ python-magic-bin==0.4.14 ; sys_platform == "win32"   # Windows에서만
 # --- 벡터·그래프 -------------------------
 faiss-cpu                            # macOS는 arm64 wheel 지원
 grandalf
+
+#---
+pysqlite3-binary
