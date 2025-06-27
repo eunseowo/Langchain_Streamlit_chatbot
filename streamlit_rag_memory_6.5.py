@@ -9,13 +9,12 @@ sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 from langchain.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
-from langchain_community.vectorstores import Chroma
+from langchain.vectorstores import FAISS
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains import create_history_aware_retriever, create_retrieval_chain
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_community.chat_message_histories.streamlit import StreamlitChatMessageHistory
-from chromadb.config import Settings
 
 # OpenAI API 키 설정
 os.environ["OPENAI_API_KEY"] = st.secrets['OPENAI_API_KEY']
@@ -29,37 +28,19 @@ def load_and_split_pdf(file_path):
 def create_vector_store(_docs):
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
     split_docs = text_splitter.split_documents(_docs)
-    persist_directory = "./chroma_db"
-
-    vectorstore = Chroma.from_documents(
+    vectorstore = FAISS.from_documents(
         documents=split_docs,
-        embedding=OpenAIEmbeddings(model='text-embedding-3-small'),
-        persist_directory=persist_directory,
-        client_settings=Settings(
-            chroma_db_impl="duckdb+parquet",
-            persist_directory=persist_directory
-        )
+        embedding=OpenAIEmbeddings(model='text-embedding-3-small')
     )
     return vectorstore
 
 @st.cache_resource
 def get_vectorstore(_docs):
-    persist_directory = "./chroma_db"
-    if os.path.exists(persist_directory):
-        return Chroma(
-            persist_directory=persist_directory,
-            embedding_function=OpenAIEmbeddings(model='text-embedding-3-small'),
-            client_settings=Settings(
-                chroma_db_impl="duckdb+parquet",
-                persist_directory=persist_directory
-            )
-        )
-    else:
-        return create_vector_store(_docs)
+    return create_vector_store(_docs)
 
 @st.cache_resource
 def initialize_components(selected_model):
-    file_path = "./data/대한민국헌법(헌법)(제00010호)(19880225).pdf"
+    file_path = "data/대한민국헌법(헌법)(제00010호)(19880225).pdf"
     pages = load_and_split_pdf(file_path)
     vectorstore = get_vectorstore(pages)
     retriever = vectorstore.as_retriever()
@@ -113,4 +94,3 @@ if prompt_message := st.chat_input("Your question"):
             with st.expander("참고 문서 확인"):
                 for doc in response['context']:
                     st.markdown(doc.metadata['source'], help=doc.page_content)
-
